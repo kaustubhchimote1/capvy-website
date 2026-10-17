@@ -1,38 +1,40 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import CAPVYShell from "@/components/CAPVYShell";
+import { lazy, Suspense } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
 
-function Router() {
-  // make sure to consider if you need authentication for certain routes
-  return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
-
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+const Assistant = lazy(() => import("@/pages/Assistant"));
+const Cashflow = lazy(() => import("@/pages/Cashflow"));
+const Home = lazy(() => import("@/pages/Home"));
+const Learn = lazy(() => import("@/pages/Learn"));
+const Markets = lazy(() => import("@/pages/Markets"));
+const News = lazy(() => import("@/pages/News"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const Premium = lazy(() => import("@/pages/Premium"));
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <Toaster />
-          <Router />
+          <Toaster theme="dark" />
+          <CAPVYShell>
+            <Suspense fallback={<div className="route-loading" role="status">Opening your learning space…</div>}>
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/cashflow" component={Cashflow} />
+                <Route path="/learn" component={Learn} />
+                <Route path="/markets" component={Markets} />
+                <Route path="/news" component={News} />
+                <Route path="/assistant" component={Assistant} />
+                <Route path="/premium" component={Premium} />
+                <Route component={NotFound} />
+              </Switch>
+            </Suspense>
+          </CAPVYShell>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
