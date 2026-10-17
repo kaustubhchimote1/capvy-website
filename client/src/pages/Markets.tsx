@@ -70,7 +70,7 @@ export default function Markets() {
         </div>
         <div className="connection-banner market-permission-banner">
           <ShieldAlert size={18} />
-          <span><strong>Market feeds unavailable</strong><small>No quotes, market caps or charts are shown.</small></span>
+          <span><strong>Live feed not connected</strong><small>No value is loaded, so there is no stale quote to refresh.</small></span>
         </div>
       </section>
 
