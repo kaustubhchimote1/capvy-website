@@ -168,13 +168,13 @@ export default function Cashflow() {
             <div className="panel-heading-row"><div><div className="eyebrow">BALANCE TIMELINE</div><h3>When money moves</h3></div><span className="tag tag-demo">Hypothetical · INR</span></div>
             <div className="timeline-legend"><span><i className="legend-line current" />Current scenario</span>{alternative && <span><i className="legend-line alternate" />{alternative.name}</span>}<span className="muted-copy">Daily closing balance · INR</span></div>
             <div className="chart-frame cashflow-chart"><ResponsiveContainer width="100%" height="100%"><LineChart data={chartRows} margin={{ top: 12, right: 18, bottom: 4, left: 6 }}>
-              <CartesianGrid stroke="rgba(160,180,168,.10)" vertical={false} />
-              <XAxis dataKey="day" type="number" domain={[1, 31]} ticks={[1, 5, 10, 15, 20, 25, 31]} tickFormatter={(day: number) => String(day)} tick={{ fill: "#829089", fontSize: 10 }} axisLine={{ stroke: "#29332e" }} tickLine={false} />
-              <YAxis tickFormatter={(value: number) => value === 0 ? "₹0" : `${value < 0 ? "−" : ""}₹${Math.abs(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k`} tick={{ fill: "#829089", fontSize: 11 }} axisLine={false} tickLine={false} width={48} />
-              <Tooltip contentStyle={{ background: "#151c19", border: "1px solid #303b35", borderRadius: 9, color: "#eef5f0" }} formatter={(value, name) => [formatINR(Number(value ?? 0)), String(name) === "alternative" ? alternative?.name ?? "Alternative" : "Balance"]} labelFormatter={(day) => `Day ${day}`} labelStyle={{ color: "#98a69e", marginBottom: 5 }} />
-              <ReferenceLine y={0} stroke="#db7772" strokeDasharray="4 5" />
-              <Line type="linear" dataKey="current" name="Balance" stroke="#16c784" strokeWidth={2.5} dot={{ r: 3, fill: "#16c784", stroke: "#0e1411", strokeWidth: 2 }} activeDot={{ r: 5 }} connectNulls />
-              {alternative && <Line type="linear" dataKey="alternative" name="Alternative" stroke="#80d8bd" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3, fill: "#80d8bd", stroke: "#0e1411", strokeWidth: 2 }} connectNulls />}
+              <CartesianGrid stroke="rgba(167, 151, 255, .12)" vertical={false} />
+              <XAxis dataKey="day" type="number" domain={[1, 31]} ticks={[1, 5, 10, 15, 20, 25, 31]} tickFormatter={(day: number) => String(day)} tick={{ fill: "#A4A1BA", fontSize: 10 }} axisLine={{ stroke: "#3C3F61" }} tickLine={false} />
+              <YAxis tickFormatter={(value: number) => value === 0 ? "₹0" : `${value < 0 ? "−" : ""}₹${Math.abs(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k`} tick={{ fill: "#A4A1BA", fontSize: 11 }} axisLine={false} tickLine={false} width={48} />
+              <Tooltip contentStyle={{ background: "#151731", border: "1px solid #3C3F61", borderRadius: 9, color: "#F6F4FF" }} formatter={(value, name) => [formatINR(Number(value ?? 0)), String(name) === "alternative" ? alternative?.name ?? "Alternative" : "Balance"]} labelFormatter={(day) => `Day ${day}`} labelStyle={{ color: "#D7D4E9", marginBottom: 5 }} />
+              <ReferenceLine y={0} stroke="#FF708D" strokeDasharray="4 5" />
+              <Line type="linear" dataKey="current" name="Balance" stroke="#B69CFF" strokeWidth={2.5} dot={{ r: 3, fill: "#B69CFF", stroke: "#151731", strokeWidth: 2 }} activeDot={{ r: 5 }} connectNulls />
+              {alternative && <Line type="linear" dataKey="alternative" name="Alternative" stroke="#C9FF73" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3, fill: "#C9FF73", stroke: "#151731", strokeWidth: 2 }} connectNulls />}
             </LineChart></ResponsiveContainer></div>
             <div className="timeline-caption"><span><span className="caption-mark" />Below ₹0 marks a projected shortfall.</span><span>Expenses precede income on a shared date.</span></div>
           </section>

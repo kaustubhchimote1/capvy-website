@@ -32,3 +32,20 @@ Global Datafeeds (GFDL) publicly documents real-time, historical, snapshot, dela
 - TradingView free website widgets: https://www.tradingview.com/widget/
 - TradingView widget-specific available markets: https://www.tradingview.com/widget-docs/markets/asia-pacific/
 - TradingView general platform data coverage: https://www.tradingview.com/data-coverage/
+
+
+## Coinbase India crypto coverage and data-use terms (checked 17 Oct 2026)
+
+Coinbase's India Explore page presents crypto-market assets and statistics in INR, including price, 24-hour change, market cap and volume. Coinbase's 31 May 2026 India launch announcement says Indian customers can use direct INR rails and local INR crypto order books for spot trading. This is cryptocurrency coverage for India, not an NSE/BSE-listed equity feed.
+
+Coinbase Exchange API documentation describes public market-data endpoints and product-pair candles. The candle endpoint returns OHLCV buckets at 60, 300, 900, 3600, 21600 or 86400 seconds, with a maximum of 300 candles per request; Coinbase says historical rates can have gaps and real-time updates should use trade/book endpoints with the WebSocket feed. Product-list documentation describes available exchange currency pairs, not a complete all-crypto market-cap universe or Indian stock directory.
+
+The Coinbase Market Data Terms of Use, last updated 7 Aug 2026, license data for personal/research purposes and prohibit building an application for other end users or redisplaying/redistributing data to third parties without Coinbase's prior express written consent. A public CAPVY crypto chart feed therefore must not use Coinbase data unless Coinbase grants written permission covering end-user website display. Do not scrape Coinbase's Explore page or treat a public API endpoint as permission to republish its data.
+
+Sources:
+- Coinbase India crypto explorer: https://www.coinbase.com/en-in/explore
+- Coinbase India INR launch: https://www.coinbase.com/blog/coinbase-launches-in-india-with-direct-inr-rails
+- Coinbase Exchange API overview: https://docs.cdp.coinbase.com/exchange/introduction/welcome
+- Coinbase product-pair list: https://docs.cdp.coinbase.com/api-reference/advanced-trade-api/rest-api/products/list-products
+- Coinbase product candles: https://docs.cdp.coinbase.com/api-reference/exchange-api/rest-api/products/get-product-candles
+- Coinbase Market Data Terms: https://www.coinbase.com/legal/market_data

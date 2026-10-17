@@ -1,31 +1,26 @@
-import {
-  Activity,
-  ArrowUpRight,
-  BookOpen,
-  CircleHelp,
-  Crown,
-  LayoutDashboard,
-  Newspaper,
-  WalletCards,
-} from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { Activity, ArrowRight, BookOpen, CircleHelp, Crown, LayoutDashboard, Newspaper, WalletCards } from "lucide-react";
+import { motion, useScroll } from "framer-motion";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
+import { Link, useLocation } from "wouter";
 
 const navigation = [
   { label: "Overview", href: "/", icon: LayoutDashboard },
-  { label: "Cashflow lab", href: "/cashflow", icon: WalletCards },
+  { label: "Cashflow", href: "/cashflow", icon: WalletCards },
   { label: "Learn", href: "/learn", icon: BookOpen },
   { label: "Markets", href: "/markets", icon: Activity },
-  { label: "Economic news", href: "/news", icon: Newspaper },
+  { label: "Economy", href: "/news", icon: Newspaper },
   { label: "Ask CAPVY", href: "/assistant", icon: CircleHelp },
 ];
 
+type NavigationItem = (typeof navigation)[number];
+
 const titleByPath: Record<string, string> = {
-  "/": "Overview",
-  "/cashflow": "Cashflow lab",
-  "/learn": "Learn",
-  "/markets": "Markets",
-  "/news": "Economic news",
+  "/": "Financial practice, made vivid",
+  "/cashflow": "Cashflow Collision Detector",
+  "/learn": "Five learning labs",
+  "/markets": "Market data status",
+  "/news": "Economic intelligence",
   "/assistant": "Ask CAPVY",
   "/premium": "CAPVY Plus",
 };
@@ -41,8 +36,7 @@ function BrandMark() {
   );
 }
 
-function NavItem({ item, mobile = false }: { item: (typeof navigation)[number]; mobile?: boolean }) {
-  const [path] = useLocation();
+function NavItem({ item, path, mobile = false }: { item: NavigationItem; path: string; mobile?: boolean }) {
   const active = path === item.href;
   const Icon = item.icon;
   return (
@@ -52,7 +46,7 @@ function NavItem({ item, mobile = false }: { item: (typeof navigation)[number]; 
       aria-current={active ? "page" : undefined}
       aria-label={mobile ? item.label : undefined}
     >
-      <Icon size={18} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <Icon size={mobile ? 18 : 15} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
       <span>{item.label}</span>
     </Link>
   );
@@ -61,49 +55,85 @@ function NavItem({ item, mobile = false }: { item: (typeof navigation)[number]; 
 export default function CAPVYShell({ children }: { children: ReactNode }) {
   const [path] = useLocation();
   const pageTitle = titleByPath[path] ?? "CAPVY";
+  const contentRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll();
+
+  useEffect(() => {
+    const root = contentRef.current;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!root || reducedMotion || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
+
+    const attachRevealTargets = () => {
+      root.querySelectorAll<HTMLElement>(".page-stack > *:not([data-scroll-bound])").forEach((element, index) => {
+        element.dataset.scrollBound = "true";
+        element.classList.add("scroll-reveal");
+        element.style.setProperty("--reveal-delay", `${Math.min(index * 55, 220)}ms`);
+        observer.observe(element);
+      });
+    };
+
+    attachRevealTargets();
+    const mutationObserver = typeof MutationObserver === "undefined" ? null : new MutationObserver(attachRevealTargets);
+    mutationObserver?.observe(root, { childList: true, subtree: true });
+
+    const revealFocusedSection = (event: FocusEvent) => {
+      if (event.target instanceof HTMLElement) {
+        event.target.closest<HTMLElement>(".scroll-reveal")?.classList.add("is-visible");
+      }
+    };
+    root.addEventListener("focusin", revealFocusedSection);
+
+    return () => {
+      observer.disconnect();
+      mutationObserver?.disconnect();
+      root.removeEventListener("focusin", revealFocusedSection);
+    };
+  }, [path]);
+
   return (
     <div className="app-shell">
-      <aside className="sidebar" aria-label="Main navigation">
-        <Link href="/" className="brand-lockup" aria-label="CAPVY home">
-          <BrandMark />
-          <span className="brand-word">CAPVY<span className="brand-dot">.</span></span>
-        </Link>
-        <p className="brand-tagline">Learn fast. Think financially.</p>
-        <div className="nav-caption">Workspace</div>
-        <nav className="side-nav">
-          {navigation.map((item) => <NavItem key={item.href} item={item} />)}
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="premium-teaser">
-            <div className="premium-teaser-icon"><Crown size={16} /></div>
-            <p className="premium-teaser-title">More room to grow</p>
-            <p className="premium-teaser-copy">A deeper learning path is on its way.</p>
-            <Link href="/premium" className="text-link">Explore what’s planned <ArrowUpRight size={13} /></Link>
-          </div>
-          <p className="sidebar-footnote">A practice space for better money decisions.</p>
-        </div>
-      </aside>
-
-      <div className="main-column">
-        <header className="topbar">
+      <motion.div className="scroll-progress" style={{ scaleX: scrollYProgress }} aria-hidden="true" />
+      <header className="topbar">
+        <div className="topbar-brand-block">
+          <Link href="/" className="brand-lockup" aria-label="CAPVY home">
+            <BrandMark />
+            <span className="brand-word">CAPVY<span className="brand-dot">.</span></span>
+          </Link>
           <div className="topbar-context">
-            <span className="topbar-kicker">CAPVY / workspace</span>
+            <span className="topbar-kicker">LEARN FAST · THINK FINANCIALLY</span>
             <h1>{pageTitle}</h1>
           </div>
-          <div className="topbar-actions">
-            <span className="mode-pill"><span className="mode-dot" /> Educational demo</span>
-            <span className="avatar-mark" aria-label="Demo profile">C</span>
-          </div>
-        </header>
-        <main className="page-content">{children}</main>
+        </div>
+
+        <nav className="side-nav" aria-label="Primary navigation">
+          {navigation.map((item) => <NavItem key={item.href} item={item} path={path} />)}
+        </nav>
+
+        <div className="topbar-actions">
+          <span className="mode-pill"><span className="mode-dot" /> PRACTICE ONLY</span>
+          <Link href="/premium" className="button-primary header-cta">CAPVY Plus <ArrowRight size={14} /></Link>
+        </div>
+      </header>
+
+      <div className="main-column">
+        <main className="page-content" ref={contentRef}>{children}</main>
         <footer className="site-footer">
           <span>CAPVY — Learn Fast. Think Financially.</span>
-          <span>Education, not investment advice. No real trades.</span>
+          <span>Education, not investment advice. No real trades. Market data appears only when its source and display rights are verified.</span>
         </footer>
       </div>
 
       <nav className="mobile-nav" aria-label="Mobile navigation">
-        {navigation.map((item) => <NavItem key={item.href} item={item} mobile />)}
+        {navigation.map((item) => <NavItem key={item.href} item={item} path={path} mobile />)}
         <Link href="/premium" className={`mobile-nav-item ${path === "/premium" ? "active" : ""}`} aria-label="CAPVY Plus">
           <Crown size={18} aria-hidden="true" /><span>Plus</span>
         </Link>

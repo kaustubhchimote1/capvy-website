@@ -1,72 +1,65 @@
-# CAPVY Website — Implementation Plan
+# CAPVY Website — Updated Implementation Plan
 
 ## Product and scope
 
-Build a premium, responsive CAPVY web application based on the supplied master brief. Use the existing initialized React/Express/tRPC/Drizzle project rather than replacing its stack. Deliver a complete navigable product experience, prioritizing the Cashflow Collision Detector as the functional deterministic slice. Other experiences provide useful interactions with explicit data-availability labels. Sample data must never be presented as live, and external services must not be claimed deployed when they are not.
+Continue the existing CAPVY financial-learning website in its initialized React 19/Vite/Express/tRPC project. The user has now requested a complete visual redesign and a scroll-animated experience, plus use of Coinbase's India market data. Coinbase's India pages cover INR-denominated cryptocurrency markets, not NSE/BSE-listed equities or general FX. Coinbase's Market Data Terms (updated 7 August 2026) prohibit redisplaying or redistributing data to third parties and building an application for other end users without prior express written consent. No such written permission is available. Therefore, do not integrate or display Coinbase quotes, market caps, candles or derived charts in CAPVY until written permission explicitly covers public end-user website display. Do not scrape or iframe Coinbase pages. Keep a simple outbound link to Coinbase's official India crypto explorer. Keep NSE/BSE and FX data clearly unavailable until separately licensed sources are supplied. Never invent or hardcode market data.
 
 ## Implementation approach
 
-- Reuse the installed React 19, Vite, Wouter, Tailwind, Lucide, Recharts, Express/tRPC and Drizzle foundation. Keep routes and reusable components under `client/src`; keep deterministic cashflow and learning-game calculations in `client/src/lib` modules with unit tests.
-- Provide a shared responsive application shell and seven primary routes: `/` dashboard, `/cashflow` simulator, `/learn` games, `/markets` market explorer, `/news` economic-news status, `/assistant` AI education, and `/premium` Coming Soon. Maintain the static route manifest in `client/public/manus-routes.json`.
-- Give the cashflow simulator editable INR starting balance and dated positive/negative transactions. Apply the documented same-day rule (expenses before income, then stable input order); compute and show each transaction’s running balance, lowest balance, first deficit date, shortfall and every distinct recovery date. Support edits, separate timing alternatives, comparisons, local save/load state, validation and explanations that never alter calculations. Keep scenarios in the browser only; do not send them to a server.
-- Build five playable financial-learning experiences with deterministic outcomes: Cashflow Survival, Business Builder, Investment Lab, Taxation Challenge (explicitly simplified educational assumptions unless current law has been researched and verified), and Market Reaction Lab (mechanisms and uncertainty, not forecasts).
-- The user has now explicitly requested **real, live market data**, including the SENSEX INR quote, absolute point and percentage move, and every active IPO-listed Indian equity. No compatible live exchange feed, API documentation, API credentials or CAPVY public-display/simulation rights are currently configured. Do not scrape exchange websites, hard-code snapshots as live, or substitute an EOD/delayed widget while claiming it is live. Keep live Indian market quotes and the full active-company directory unavailable until the user supplies a feed whose contract explicitly covers live website display and CAPVY's educational/simulation use. Show source, exchange, timestamp and live/stale/closed-market state once an authorized feed is integrated. Do not claim full listing coverage beyond that feed's verified universe.
-- Continue to label crypto/currency data and news separately by their real source/status. Do not fabricate values or articles when their providers are not configured.
-- Provide an attributed news-feed surface that does not invent stories, plus explicit status for the requested Render Economic Intelligence Pipeline. The pipeline is not configured, implemented, deployed or scheduled in this preview; retain that boundary in all UI and documentation until verified.
-- Build the AI education assistant as a server-side tRPC route using configured platform model-service credentials, validation, a timeout, cautious educational system guidance and a demonstration usage guardrail. Report whether service credentials are configured through a status endpoint. Accept user-authored turns only; reserve an in-process network/day reply slot and refund it when a request fails. One backend model response was successfully verified during this build; the assistant still has no news or live-market retrieval.
-- Premium is explicitly Coming Soon. Do not add checkout, payment, prices, charges or fake subscription confirmation.
-- Use the provisioned Manus backend only for safe, actually configured features. No Render service, news/market provider, Render Workflow, scheduler, CAPVY database schema or user-specific persistent finance-data path is configured. The starter includes generic Manus OAuth routes and a users table, but no CAPVY sign-in/profile UI or CAPVY user-data tables/ownership layer. Document limits honestly. No banking, Aadhaar/PAN, brokerage credentials or real trading.
-- Add accessible controls, visible focus, mobile layouts, keyboard support, reduced-motion behavior, stable loading/error/empty/unavailable states, clear source labels, and truthful educational/financial caveats.
+- Preserve the working calculator, games, AI education assistant, news status, routes and accessibility behavior; redesign their shared shell and visual language rather than replacing product logic. Maintain the seven client routes and the static route manifest at `client/public/manus-routes.json`.
+- Replace the left-rail workspace with a sticky horizontal brand/navigation bar, clear education-only status, mobile navigation and a scroll-led editorial landing page. Keep dense task pages functional and responsive.
+- Create a cinematic but legible Home narrative with a hero, a clearly fictional cashflow sample, a market-data permission/status section, learning/game links, and calls to action. Provide a real user path to every existing feature; do not imply any unconnected feed is live.
+- Apply a new high-contrast indigo/violet and acid-lime visual system across all routes while retaining a dark editorial canvas, coral negative-risk color, amber uncertainty states, DM Sans/Space Grotesk/DM Mono and CAPVY branding.
+- Implement site-wide section reveals using IntersectionObserver and CSS transitions; use a scroll-progress indicator and restrained decorative hero motion. Add visible reveal on keyboard focus. If IntersectionObserver is unavailable, or reduced motion is requested, keep all content immediately visible without motion. Respect `prefers-reduced-motion`; do not animate financial figures in a way that could be mistaken for changing quotes.
+- Rework the market page to explain Coinbase India crypto coverage and its data-display permission requirement, link to Coinbase's official explorer, and keep crypto prices/market caps/charts blank until written redistribution permission is available. Label NSE/BSE equities and general FX separately as unavailable; Coinbase is not their data source.
+- Keep core cashflow and learning-game calculations in their current deterministic client modules. Keep the assistant server-side with its existing schema validation, status and success-only quota accounting. No market-data API key, customer trading connection, or account/trading permission is needed for the visual redesign.
+- Continue honest statuses for the unimplemented Render news pipeline, market providers, app-specific authentication/persistence and Premium page; do not add a checkout, quote feed, or claiming language.
 
 ## Project structure
 
-- `client/src/App.tsx`: lazy-loaded route map and shared application providers.
-- `client/src/pages/`: dashboard, simulator, five learning labs, market explorer, economic-news status, assistant and Premium Coming Soon.
-- `client/src/components/`: application shell, sidebar/mobile navigation and reusable UI primitives.
-- `client/src/lib/cashflow.ts`: pure INR cashflow calculation, validation, event-level balances and recovery-date functions independent of UI.
-- `client/src/lib/games.ts`: deterministic classroom-simulation calculations for survival, business, recurring contributions and simplified tax.
-- `client/src/lib/format.ts`: shared INR and date display helpers.
-- `client/public/manus-routes.json`: canonical page route manifest served at `/manus-routes.json`; `client/public/capvy-mark.svg`: site favicon.
-- `server/assistant.ts`: validated server-side educational assistant endpoint, status query and response quota.
-- `server/assistantQuota.ts`: testable UTC-day allowance reservations and refunds for failed requests.
-- `server/routers.ts`: application tRPC router registration.
-- `client/src/index.css`: CAPVY design tokens, typography, layout, responsive behavior and reduced-motion styling.
-- `client/src/lib/*.test.ts` and `server/assistant*.test.ts`: deterministic calculations, request-boundary and quota tests registered with Vitest.
-- `app.config.ts`: quoted project `logoUrl` branding metadata.
-- `plan.md`, `TODO.md`, `README.md` and `market-data-notes.md`: approved approach, progress/acceptance clauses, setup/known limitations and external market-data source/rights notes.
+- `client/src/App.tsx`: lazy route map and providers.
+- `client/src/components/CAPVYShell.tsx`: sticky responsive navigation, education-only status, scroll progress, scroll reveal observer and site footer.
+- `client/src/pages/Home.tsx`: long-scroll CAPVY editorial landing narrative with a labeled fictional simulator preview and provider status.
+- `client/src/pages/Markets.tsx`: category-specific source/permission status and official outbound data links; no copied Coinbase data.
+- `client/src/pages/`: existing cashflow simulator, learning games, economic-news status, assistant and Premium routes; preserve behavior while applying the new shared skin.
+- `client/src/lib/`: deterministic cashflow, game and formatting helpers plus tests.
+- `server/assistant.ts`, `server/assistantQuota.ts`, `server/routers.ts`: existing server-side education assistant, status/quota and API registration.
+- `client/src/index.css`: global indigo/lime palette, responsive design, page/layout systems, scroll-reveal and reduced-motion styles.
+- `client/public/manus-routes.json`, `client/public/capvy-mark.svg`, `app.config.ts`: route manifest and CAPVY website/project identity.
+- `README.md`, `TODO.md`, `plan.md`, `market-data-notes.md`: setup, truthful delivery status, updated acceptance clauses and sourced provider-rights facts.
 
 ## Design
 
-Three visual directions considered (each intentionally sampled below 0.10):
+Three directions considered (each intentionally sampled below 0.10):
 
-1. **Nocturne market terminal — 0.08**: editorial charcoal data surfaces with selective emerald signal color. **Selected**, consistent with the user's explicit premium dark/emerald brief.
-2. **Warm paper ledger — 0.05**: light editorial cards, muted ink and moss.
-3. **Electric student lab — 0.03**: high-contrast cobalt panels and playful data graphics.
+1. **Kinetic ink editorial — 0.08 (selected)**: a dark indigo financial-learning journal with oversized type, electric violet, acid-lime signals and scroll-led sections.
+2. **Warm paper ledger — 0.05**: an ivory journal with gentle plum and orange marks.
+3. **Minimal market terminal — 0.03**: a restrained navy interface with small mono data labels.
 
-**Design movement:** Contemporary financial editorial design paired with the calm precision of a market terminal.
+**Design movement:** Neo-brutalist editorial design blended with digital collage and scrollytelling.
 
-**Core principles:** Financial clarity before ornament; disciplined, restrained color; useful density with generous breathing room; transparent provenance for every illustrative or external value.
+**Core principles:** Strong editorial hierarchy; honest data provenance; action before decoration; accessible motion and controls.
 
-**Color philosophy:** Deep charcoal backgrounds communicate focus, while a distinct emerald green signals CAPVY's learning and positive movement. Warm neutral text protects readability; red signals negative financial outcomes, and amber is reserved for risk, uncertainty and missing data.
+**Color philosophy:** Deep ink-indigo remains the calm canvas, while electric violet makes CAPVY memorable and signals exploration. Acid lime highlights selected actions and learning cues. Coral communicates negative financial outcomes; amber signals missing data or risk. The palette is deliberately distinct from the previous restrained emerald terminal.
 
-**Layout paradigm:** A compact desktop rail anchors a broad editorial workspace. The dashboard leads with a clear welcome/cashflow-status band and balances the core simulator against concise market and learning modules. On small screens, touch-sized bottom navigation and stacked content preserve chart and text readability.
+**Layout paradigm:** A sticky horizontal masthead frames a vertical, story-driven Home page. Each scroll section has a clear narrative purpose and asymmetrical geometry. Interior routes reuse this generous editorial rhythm while keeping forms and charts compact enough for work. Mobile navigation stays thumb-friendly and every page reads in a single column.
 
-**Signature elements:** A geometric CAPVY C/forward-signal mark; emerald signal dividers and compact labels; consistent status chips differentiating hypothetical, demo and unavailable values.
+**Signature elements:** A CAPVY forward-signal C mark; large chapter numerals and thin orbit/radar lines; violet/citrus status lozenges for live, hypothetical, blocked and setup-required states.
 
-**Interaction philosophy:** Controls produce immediate, explainable feedback. Simulation edits recalculate deterministically; alternatives remain separate. Every data element communicates its origin. No motion should obscure a negative cash balance or caveat.
+**Interaction philosophy:** Motion reveals structure rather than hiding it. Buttons and simulator controls respond immediately. Data states never imitate a live ticker. Keyboard focus reveals any off-screen section so animation cannot conceal a focused control.
 
-**Animation:** Short opacity/position transitions (about 140–220ms), restrained chart transitions, no persistent movement or layout shift, and nonessential motion disabled under `prefers-reduced-motion`.
+**Animation:** Use an IntersectionObserver to reveal major sections once as they enter the viewport (about 18–24px travel over 450–650ms with a restrained stagger). Show a slim scroll-progress line. Allow a very slow decorative orbital float in the hero only. Do not continuously animate quote values, do not create parallax that shifts content away from the pointer, and do not delay controls. When `prefers-reduced-motion` is enabled, disable reveal transforms, parallax and smooth scrolling; render all content in its final visible position. Unsupported observers leave content visible.
 
-**Typography system:** DM Sans for body copy and controls; Space Grotesk for editorial headings and compact amounts; DM Mono for balances, dates and data labels. Use an editorial heading scale, restrained uppercase labels and tabular numerals for rupee values.
+**Typography system:** Space Grotesk for headlines and bold chapter numerals; DM Sans for body copy and controls; DM Mono for dates, rupee values and source/status labels. Use a large, responsive hero scale, concise body line lengths, and tabular numerals for simulation values.
 
-**Brand essence:** Financial intelligence for India's next generation—learn concepts, explore markets and test decisions before risking money. Personality: clear, thoughtful, empowering.
+**Brand essence:** Financial intelligence for India's next generation—learn concepts, explore markets and test decisions before risking money. Personality: bold, clear, responsible.
 
-**Brand voice:** Confident and plain-spoken; explain rather than hype. Example lines: “See the squeeze before it happens.” “A scenario, not a prediction.”
+**Brand voice:** Direct, motivating and grounded; never promise returns or describe missing data as live. Example lines: “Money moves. Learn to read the moment.” “A scenario, not a prediction.”
 
-**Wordmark & logo:** CAPVY wordmark with a custom geometric C/forward-signal mark in emerald and neutral text.
+**Wordmark & logo:** Retain CAPVY's geometric C/forward-signal mark, recolored in electric violet with an acid-lime signal detail; pair it with a bold custom-feeling wordmark treatment rather than a default nav label.
 
-**Signature brand color:** CAPVY Signal Emerald (`#16C784`).
+**Signature brand color:** CAPVY Electric Violet (`#B69CFF`).
 
 ## Frontend and backend responsibilities
 
-The website runs in the initialized Manus Webdev environment. Core cashflow and game calculations execute in client-side deterministic modules and do not depend on AI or external data. The server-side assistant calls the configured platform model endpoint; user cashflow inputs are not sent to it. The managed database capability and generic Manus OAuth/users-table starter exist, but there are no CAPVY application tables, CAPVY sign-in/profile UI, ownership model or user-specific stored records. No authorized live NSE/BSE data feed, provider credential, market data API or public-display/simulation rights are configured. Do not show a current SENSEX price or live NSE/BSE company directory until those requirements are met. No news provider or Render service/Workflow is configured or verified. Such integrations must remain setup-required until real credentials, rights, deployment and behavior are proven.
+The redesign is frontend-only except for preserving existing application APIs. Cashflow and game math remain deterministic client-side. The server-side assistant continues to use its configured platform model endpoint; no market prompts or data are added. Coinbase India provides crypto-related INR market views, but its Market Data Terms currently block republishing that data in an end-user CAPVY app without written permission. Do not create an API endpoint or frontend integration for Coinbase until such permission is supplied. Coinbase is not an NSE/BSE equity or general FX feed. No live data is to be shown for those categories either. Render, news-source, user-authentication and CAPVY persistence limitations remain unchanged.
