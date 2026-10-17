@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { publicPlatformScript } from "./server/_core/publicConfig";
+import { redactSensitiveLogData } from "./server/logRedaction";
 
 // =============================================================================
 // Manus Debug Collector - Vite Plugin
@@ -58,7 +59,7 @@ function writeToLogFile(source: LogSource, entries: unknown[]) {
   // Format entries with timestamps
   const lines = entries.map((entry) => {
     const ts = new Date().toISOString();
-    return `[${ts}] ${JSON.stringify(entry)}`;
+    return `[${ts}] ${JSON.stringify(redactSensitiveLogData(entry))}`;
   });
 
   // Append to log file
