@@ -7,8 +7,31 @@ import { trpc } from "@/lib/trpc";
 const demoResult = calculateCashflow(DEFAULT_SCENARIO);
 const learningLabs = ["Cashflow Survival", "Business Builder", "Investment Lab", "Taxation Challenge", "Market Reaction Lab"];
 
+function formatBackendCheckTime(value?: string) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const formatted = new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
+  return `${formatted} IST`;
+}
+
 export default function Home() {
   const assistantStatus = trpc.assistant.status.useQuery(undefined, { staleTime: 30_000 });
+  const accountStats = trpc.community.registeredAccounts.useQuery(undefined, {
+    staleTime: 15_000,
+    retry: false,
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  });
   const assistantLabel = assistantStatus.isLoading
     ? "Checking setup"
     : assistantStatus.data?.configured
@@ -115,8 +138,39 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="story-section story-community">
+        <div className="story-section-index"><span>03</span><span>REAL CAPVY ACCOUNTS</span></div>
+        <div className="story-section-body story-community-body">
+          <div className="story-copy">
+            <p className="eyebrow">A COUNT FROM THE CAPVY BACKEND</p>
+            <h2>Real account records. No invented audience numbers.</h2>
+            <p>This total is fetched from CAPVY’s registered-account database. We show an aggregate only—never people’s names, email addresses or profile cards.</p>
+          </div>
+          <article className="community-count-card" role="status" aria-live="polite" aria-atomic="true">
+            <div className="community-count-topline"><span>REGISTERED CAPVY ACCOUNTS</span><span className="community-live-mark"><span /> BACKEND</span></div>
+            <strong className={`community-count-value ${accountStats.data ? "" : "community-count-pending"}`}>
+              {accountStats.data ? accountStats.data.count.toLocaleString("en-IN") : accountStats.isPending ? "—" : "Unavailable"}
+            </strong>
+            <p className="community-count-status">
+              {accountStats.isPending && "Checking the CAPVY database…"}
+              {!accountStats.data && accountStats.isError && "The backend count is unavailable; no number has been assumed."}
+              {accountStats.data && accountStats.isRefetchError && "Refresh failed. Showing the last confirmed backend count."}
+              {accountStats.data?.count === 0 && !accountStats.isRefetchError && "No registered CAPVY accounts are recorded yet."}
+              {accountStats.data && accountStats.data.count > 0 && !accountStats.isRefetchError && "Registered account records in the CAPVY database."}
+            </p>
+            <div className="community-count-meta">
+              <span>{formatBackendCheckTime(accountStats.data?.checkedAt) ? `Updated ${formatBackendCheckTime(accountStats.data?.checkedAt)}` : "Update time unavailable"}</span>
+              <button type="button" onClick={() => void accountStats.refetch()} disabled={accountStats.isFetching}>
+                {accountStats.isFetching ? "Refreshing…" : "Refresh count"}
+              </button>
+            </div>
+            <p className="community-privacy-note"><ShieldCheck size={13} aria-hidden="true" /> Aggregate only. No user identities are shown.</p>
+          </article>
+        </div>
+      </section>
+
       <section className="story-section story-markets">
-        <div className="story-section-index"><span>03</span><span>FOLLOW WITH CONTEXT</span></div>
+        <div className="story-section-index"><span>04</span><span>FOLLOW WITH CONTEXT</span></div>
         <div className="story-section-body">
           <div className="story-copy">
             <p className="eyebrow">MARKET DATA HAS TO EARN ITS PLACE</p>
@@ -135,7 +189,7 @@ export default function Home() {
       </section>
 
       <section className="story-section story-tools">
-        <div className="story-section-index"><span>04</span><span>KEEP EXPLORING</span></div>
+        <div className="story-section-index"><span>05</span><span>KEEP EXPLORING</span></div>
         <div className="story-tools-grid">
           <Link href="/news" className="story-tool-card">
             <span className="tool-icon"><BookOpen size={17} /></span><span className="tool-label">ECONOMY</span><h3>News with the source attached.</h3><p>No verified news feed is connected, and no headlines are invented.</p><span className="tool-status">FEED NOT CONNECTED</span><ArrowUpRight className="tool-arrow" size={16} />

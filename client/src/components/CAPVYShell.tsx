@@ -1,4 +1,4 @@
-import { Activity, ArrowRight, BookOpen, CircleHelp, Crown, LayoutDashboard, Newspaper, WalletCards } from "lucide-react";
+import { Activity, ArrowRight, BookOpen, CircleHelp, Crown, LayoutDashboard, Newspaper, UserRound, WalletCards } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
@@ -17,6 +17,8 @@ type NavigationItem = (typeof navigation)[number];
 
 const titleByPath: Record<string, string> = {
   "/": "Financial practice, made vivid",
+  "/signup": "Create your CAPVY account",
+  "/login": "Log in to CAPVY",
   "/cashflow": "Cashflow Collision Detector",
   "/learn": "Five learning labs",
   "/markets": "Market data status",
@@ -120,6 +122,9 @@ export default function CAPVYShell({ children }: { children: ReactNode }) {
 
         <div className="topbar-actions">
           <span className="mode-pill"><span className="mode-dot" /> PRACTICE ONLY</span>
+          <Link href="/login" className="header-auth-link" aria-label="Sign in or create a CAPVY account" title="Sign in or create a CAPVY account">
+            <UserRound size={15} aria-hidden="true" /><span>Sign in</span>
+          </Link>
           <Link href="/premium" className="button-primary header-cta">CAPVY Plus <ArrowRight size={14} /></Link>
         </div>
       </header>

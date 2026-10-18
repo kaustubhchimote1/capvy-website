@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 const Assistant = lazy(() => import("@/pages/Assistant"));
+const AuthPage = lazy(() => import("@/pages/Auth"));
 const Cashflow = lazy(() => import("@/pages/Cashflow"));
 const Home = lazy(() => import("@/pages/Home"));
 const Learn = lazy(() => import("@/pages/Learn"));
@@ -25,6 +26,8 @@ function App() {
             <Suspense fallback={<div className="route-loading" role="status">Opening your learning space…</div>}>
               <Switch>
                 <Route path="/" component={Home} />
+                <Route path="/signup" component={AuthPage} />
+                <Route path="/login" component={AuthPage} />
                 <Route path="/cashflow" component={Cashflow} />
                 <Route path="/learn" component={Learn} />
                 <Route path="/markets" component={Markets} />

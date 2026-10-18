@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -74,6 +74,20 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
   }
+}
+
+export async function getRegisteredAccountCount(): Promise<number> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database is not available");
+  }
+
+  const [row] = await db.select({ total: count() }).from(users);
+  const total = Number(row?.total ?? 0);
+  if (!Number.isSafeInteger(total) || total < 0) {
+    throw new Error("Registered account count is invalid");
+  }
+  return total;
 }
 
 export async function getUserByOpenId(openId: string) {

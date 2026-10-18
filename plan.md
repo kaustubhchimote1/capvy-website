@@ -6,31 +6,45 @@ Continue the existing CAPVY financial-learning website in its initialized React 
 
 ## Implementation approach
 
-- Preserve the working calculator, games, AI education assistant, news status, routes and accessibility behavior; redesign their shared shell and visual language rather than replacing product logic. Maintain the seven client routes and the static route manifest at `client/public/manus-routes.json`.
+- Preserve the working calculator, games, AI education assistant, news status, routes and accessibility behavior; redesign their shared shell and visual language rather than replacing product logic. Maintain all client routes, including `/login` and `/signup`, in the static route manifest at `client/public/manus-routes.json`.
 - Replace the left-rail workspace with a sticky horizontal brand/navigation bar, clear education-only status, mobile navigation and a scroll-led editorial landing page. Keep dense task pages functional and responsive.
 - Create a cinematic but legible Home narrative with a hero, a clearly fictional cashflow sample, a market-data permission/status section, learning/game links, and calls to action. Provide a real user path to every existing feature; do not imply any unconnected feed is live.
 - Apply a new high-contrast indigo/violet and acid-lime visual system across all routes while retaining a dark editorial canvas, coral negative-risk color, amber uncertainty states, DM Sans/Space Grotesk/DM Mono and CAPVY branding.
+- Add dedicated `/signup` and `/login` modes in a shared, responsive CAPVY account page, exposed through an accessible masthead account link. Use the existing Manus OAuth flow as the default identity provider: both modes continue to the secure Manus authorization portal, where new users can create a Manus account or existing users can sign in. Do not collect or store CAPVY passwords or invent a second authentication provider.
+- Add an Overview community section showing the real aggregate number of registered CAPVY accounts, read from the existing MySQL `users` table through a public backend query. Return only the count and a server-generated check time; never expose names, emails, open IDs, login methods or fabricated profile cards. Update after backend refresh and show loading, zero, error and timestamp states truthfully.
 - Implement site-wide fade-and-rise section reveals using IntersectionObserver and CSS transitions: about 18px travel, subtle blur clearing as sections enter, a light stagger and smooth, brief easing. Keep a slim scroll-progress indicator and restrained decorative hero motion. Reveal focused sections on keyboard focus. If IntersectionObserver is unavailable, or reduced motion is requested, keep all content immediately visible without motion. Respect `prefers-reduced-motion`; do not animate financial figures in a way that could be mistaken for changing quotes.
 - Rework the market page to explain Coinbase India crypto coverage and its data-display permission requirement, link to Coinbase's official explorer, and keep crypto prices/market caps/charts blank until written redistribution permission is available. Label NSE/BSE equities and general FX separately as unavailable; Coinbase is not their data source. No live feed is connected, so no market value is currently stale or refreshable. After a licensed source is configured, follow its supported polling/stream cadence, show source quote time and CAPVY fetch time, label staleness against the provider's freshness contract, and never display stale values as live.
 - Keep core cashflow and learning-game calculations in their current deterministic client modules. Keep the assistant server-side with its existing schema validation, status and success-only quota accounting. No market-data API key, customer trading connection, or account/trading permission is needed for the visual redesign.
-- Continue honest statuses for the unimplemented Render news pipeline, market providers, app-specific authentication/persistence and Premium page; do not add a checkout, quote feed, or claiming language.
+- Continue honest statuses for the unimplemented Render news pipeline, market providers, CAPVY profile/settings and cross-device persistence, and Premium page; do not add email/password authentication, checkout, quote feed, or misleading claims.
 
 ## Project structure
 
 - `client/src/App.tsx`: lazy route map and providers.
+- `client/src/pages/Auth.tsx`: shared sign-up/sign-in screen, authenticated state, safe OAuth error messaging and sign-out using existing client auth helpers.
 - `client/src/components/CAPVYShell.tsx`: sticky responsive navigation, education-only status, scroll progress, scroll reveal observer and site footer.
-- `client/src/pages/Home.tsx`: long-scroll CAPVY editorial landing narrative with a labeled fictional simulator preview and provider status.
+- `client/src/pages/Home.tsx`: long-scroll CAPVY editorial landing narrative with a labeled fictional simulator preview, provider status and a backend-driven aggregate account count.
 - `client/src/pages/Markets.tsx`: category-specific source/permission status, one backend diagnostics query, and official outbound data links; no copied Coinbase data.
 - `client/src/pages/`: existing cashflow simulator, learning games, economic-news status, assistant and Premium routes; preserve behavior while applying the shared skin.
+- `client/src/_core/hooks/useAuth.ts`, `client/src/const.ts`: existing authenticated-user query, logout, and nonce-bound Manus OAuth initiation.
 - `client/src/lib/`: deterministic cashflow, game and formatting helpers plus tests.
 - `server/assistant.ts`, `server/assistantQuota.ts`, `server/routers.ts`: existing server-side education assistant, status/quota and API registration.
 - `server/_core/index.ts`, `server/marketDataDiagnostics.ts`: Express health/API routes and the safe no-provider market diagnostics response.
+- `server/_core/oauth.ts`, `server/_core/sdk.ts`, `server/_core/cookies.ts`, `server/routers.ts`: existing Manus OAuth callback, signed session verification, secure Preview cookie options, authenticated-user lookup and logout. Keep the `webdev_app_session` name, nonce binding, HS256 verification and matching `appId`; map callback failures to fixed safe login-page errors, never an arbitrary return URL.
+- `server/db.ts`, `server/routers.ts`: read-only registered-account count query with a server-side timestamp; expose no user-row fields to the public Overview.
 - `server/logRedaction.ts`: recursive masking of sensitive values in local development request logs.
 - `shared/marketData.ts`: Zod diagnostics response contract shared by server and client.
 - `server/marketDataDiagnostics.test.ts`, `server/logRedaction.test.ts`: deterministic tests for unavailable market status, secret-safe diagnostics, and development-log redaction.
 - `client/src/index.css`: global indigo/lime palette, responsive design, page/layout systems, scroll-reveal and reduced-motion styles.
 - `client/public/manus-routes.json`, `client/public/capvy-mark.svg`, `app.config.ts`: route manifest and CAPVY website/project identity.
 - `README.md`, `TODO.md`, `plan.md`, `market-data-notes.md`: setup, truthful delivery status, acceptance clauses and sourced provider-rights facts.
+
+## Sign-up and login continuation
+
+The CAPVY page distinguishes account creation from returning-user sign-in while using the same Manus OAuth authorization flow. Reuse `startLogin()`, the one-time `__Host-oauth_state` nonce, `/api/oauth/callback`, the existing `users` row, and the validated `webdev_app_session` cookie. Preserve `HttpOnly; Secure; SameSite=None; Path=/` for embedded HTTPS Preview, and retain server-side HS256 and `MANUS_PROJECT_ID` checks. Show truthful logged-out, checking, signed-in, cancellation and failure states; include sign-out via the existing auth mutation. Do not gate public learning routes, collect bank/broker credentials, promise cross-device progress sync, or imply that a CAPVY profile or learning-history system exists. Update the route manifest for both new pages.
+
+## Overview registered-account count continuation
+
+Use the existing shared `users` table without creating, seeding, editing or deleting user rows. A read-only backend query returns only `COUNT(*)` for CAPVY accounts and a server `checkedAt` timestamp. The Overview labels the metric “Registered CAPVY accounts,” not “active users” unless a real activity window is separately defined. Refresh from the backend on page entry and at a restrained interval (60 seconds) plus focus; display the timestamp in India Standard Time. Show a true zero distinctly from a database/query failure. Do not display names, emails, open IDs, login methods, user lists, synthetic avatars/testimonials or any individual account details. Development and publication share the same managed database, so verification must not create test users or mutate live rows.
 
 ## Design
 
